@@ -17,6 +17,3 @@ RUN chmod 600 /certs/server.key
 RUN chmod 644 /certs/server.crt
 
 WORKDIR /app
-
-# Copy the source code
-COPY . /app
