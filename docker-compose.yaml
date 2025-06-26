@@ -1,0 +1,13 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: ../dockerfile
+    working_dir: /app
+    command: python server.py
+  client:
+    build:
+      context: ./client
+      dockerfile: ../dockerfile
+    working_dir: /app
+    command: python client.py
