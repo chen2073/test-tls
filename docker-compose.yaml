@@ -17,3 +17,9 @@ services:
     environment:
       - HOST=server
       - PORT=8000
+  rust_client:
+    build:
+      context: ./rust_client
+    environment:
+      - HOST=server
+      - PORT=8000

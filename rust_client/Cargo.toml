@@ -1,0 +1,8 @@
+[package]
+name = "rust_client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+openssl = "0.10.73"
+tokio = "1.45.1"
