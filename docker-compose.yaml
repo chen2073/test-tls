@@ -4,9 +4,9 @@ services:
       context: .
       target: python
     working_dir: /app
-    command: python server.py
+    command: python -m server.tcp
     volumes:
-      - ./server:/app
+      - ./server:/app/server
     environment:
       - HOST=0.0.0.0
       - PORT=8000
@@ -21,6 +21,8 @@ services:
     environment:
       - HOST=server
       - PORT=8000
+    depends_on:
+      - server
   rust_client:
     build:
       context: ./rust_client
