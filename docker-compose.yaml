@@ -1,6 +1,8 @@
 services:
   server:
-    build: .
+    build: 
+      context: .
+      target: python
     working_dir: /app
     command: python server.py
     volumes:
@@ -9,7 +11,9 @@ services:
       - HOST=0.0.0.0
       - PORT=8000
   client:
-    build: .
+    build:
+      context: .
+      target: python
     working_dir: /app
     command: python client.py
     volumes:
@@ -20,6 +24,8 @@ services:
   rust_client:
     build:
       context: ./rust_client
+      dockerfile: ../Dockerfile
+      target: rust
     environment:
       - HOST=server
       - PORT=8000
