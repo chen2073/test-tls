@@ -2,8 +2,8 @@ import socket
 import os
 import ssl
 
-HOST = os.environ.get("HOST")
-PORT = int(os.environ.get("PORT"))
+HOST = os.environ.get("HOST", "server")
+PORT = int(os.environ.get("PORT", "8000"))
 
 context = ssl.create_default_context()
 context.load_verify_locations("/certs/cert.pem")
