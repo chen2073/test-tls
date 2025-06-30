@@ -1,10 +1,50 @@
-use tokio::net::TcpStream;
-use tokio::io::AsyncWriteExt;
-use std::error::Error;
+// use tokio::net::TcpStream;
+// use tokio::io::AsyncWriteExt;
+// use std::error::Error;
 use std::env;
+use openssl::ssl::{SslConnector, SslMethod, SslStream};
+use std::io::{Read, Write};
+use std::net::TcpStream;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+// #[tokio::main]
+// async fn main() -> Result<(), Box<dyn Error>> {
+//     let host = match env::var("HOST") {
+//         Ok(host) => host,
+//         Err(_) => String::from("server"),
+//     };
+
+//     let port  = match env::var("PORT") {
+//         Ok(port) => port,
+//         Err(_) => String::from("8000"), 
+//     };
+
+//     let address = format!("{}:{}", host, port);
+
+//     let mut stream = TcpStream::connect(address).await?;
+//     println!("created stream");
+
+//     stream.write_all(b"hello world\n").await?;
+
+//     stream.readable().await?;
+//     let mut buf = [0; 4096];
+
+//     match stream.try_read(&mut buf) {
+//         Ok(0) => {
+//             println!("received: nothing");
+//         },
+//         Ok(n) => {
+//             let response = String::from_utf8_lossy(&buf[..n]);
+//             println!("received: {}", response);
+//         },
+//         Err(_) => {
+//             println!("err reading buffer");
+//         }
+//     }
+
+//     Ok(())
+// }
+
+fn main() {
     let host = match env::var("HOST") {
         Ok(host) => host,
         Err(_) => String::from("server"),
@@ -17,26 +57,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let address = format!("{}:{}", host, port);
 
-    let mut stream = TcpStream::connect(address).await?;
-    println!("created stream");
+    let mut connector = SslConnector::builder(SslMethod::tls()).unwrap();
+    
+    connector.set_verify(openssl::ssl::SslVerifyMode::NONE);
+        
+    let connector = connector
+        .build();
 
-    stream.write_all(b"hello world\n").await?;
+    let raw_stream = TcpStream::connect(address).unwrap();
+    let mut stream = connector.connect(&host, raw_stream).unwrap();
 
-    stream.readable().await?;
-    let mut buf = [0; 4096];
-
-    match stream.try_read(&mut buf) {
-        Ok(0) => {
-            println!("received: nothing");
-        },
-        Ok(n) => {
-            let response = String::from_utf8_lossy(&buf[..n]);
-            println!("received: {}", response);
-        },
-        Err(_) => {
-            println!("err reading buffer");
-        }
-    }
-
-    Ok(())
+    stream.write_all(b"hello world").unwrap();
+    let mut res = vec![];
+    stream.read_to_end(&mut res).unwrap();
+    println!("recieved: {}", String::from_utf8_lossy(&res));
 }

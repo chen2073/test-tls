@@ -1,4 +1,4 @@
-FROM python:3.9 as python
+FROM python:3.9 AS python
 
 # Install required packages
 RUN apt-get update && apt-get install -y \
@@ -14,12 +14,16 @@ RUN openssl req -x509 -newkey rsa:4096 -keyout /certs/key.pem -out /certs/cert.p
 
 WORKDIR /app
 
-FROM rust:1.85 as rust
+FROM rust:1.85 AS rust
 
 RUN apt-get update && apt-get install build-essential libssl-dev pkg-config -y && \
     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt install -y openssl
+
+WORKDIR /certs
+
+COPY --from=python /certs ./
 
 WORKDIR /app
 

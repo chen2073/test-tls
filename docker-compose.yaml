@@ -4,7 +4,7 @@ services:
       context: .
       target: python
     working_dir: /app
-    command: python -m server.tcp
+    command: python -m server.tls
     volumes:
       - ./server:/app/server
     environment:
