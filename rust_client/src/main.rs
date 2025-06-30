@@ -57,12 +57,12 @@ fn main() {
 
     let address = format!("{}:{}", host, port);
 
-    let mut connector = SslConnector::builder(SslMethod::tls()).unwrap();
+    let mut connector_builder = SslConnector::builder(SslMethod::tls()).unwrap();
     
-    connector.set_verify(openssl::ssl::SslVerifyMode::NONE);
-        
-    let connector = connector
-        .build();
+    connector_builder.set_ca_file("/certs/cert.pem")
+        .unwrap_or_else(|_| panic!("unable to load cert"));
+    
+    let connector = connector_builder.build();
 
     let raw_stream = TcpStream::connect(address).unwrap();
     let mut stream = connector.connect(&host, raw_stream).unwrap();
@@ -70,5 +70,5 @@ fn main() {
     stream.write_all(b"hello world").unwrap();
     let mut res = vec![];
     stream.read_to_end(&mut res).unwrap();
-    println!("recieved: {}", String::from_utf8_lossy(&res));
+    println!("received: {}", String::from_utf8_lossy(&res));
 }
