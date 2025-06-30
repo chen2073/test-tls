@@ -59,8 +59,12 @@ fn main() {
 
     let mut connector_builder = SslConnector::builder(SslMethod::tls()).unwrap();
     
-    connector_builder.set_ca_file("/certs/cert.pem")
-        .unwrap_or_else(|_| panic!("unable to load cert"));
+    // disable verify
+    connector_builder.set_verify(openssl::ssl::SslVerifyMode::NONE);
+    
+    // // use local cert file
+    // connector_builder.set_ca_file("/certs/cert.pem")
+    //     .unwrap_or_else(|_| panic!("unable to load cert"));
     
     let connector = connector_builder.build();
 
