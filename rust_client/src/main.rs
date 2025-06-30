@@ -68,7 +68,10 @@ fn main() {
     let mut stream = connector.connect(&host, raw_stream).unwrap();
 
     stream.write_all(b"hello world").unwrap();
-    let mut res = vec![];
-    stream.read_to_end(&mut res).unwrap();
-    println!("received: {}", String::from_utf8_lossy(&res));
+    
+    // Read a fixed amount of data instead of reading until EOF
+    let mut buffer = [0; 1024];
+    let bytes_read = stream.read(&mut buffer).unwrap();
+    let response = String::from_utf8_lossy(&buffer[..bytes_read]);
+    println!("received: {}", response);
 }
