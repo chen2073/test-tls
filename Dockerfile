@@ -1,4 +1,4 @@
-FROM python:3.9 AS python
+FROM python:3.12 AS python
 
 # Install required packages
 RUN apt-get update && apt-get install -y \
