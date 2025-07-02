@@ -4,7 +4,7 @@ services:
       context: .
       target: python
     working_dir: /app
-    command: python -m server.tls_nonblock
+    command: python -m server.tls_claude
     volumes:
       - ./server:/app/server
     environment:
