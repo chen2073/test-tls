@@ -68,22 +68,24 @@ while client_socket:
             print(f"handshake fail {e}")
             break
     
-    # Handle data
-    if client_socket in readable:
-        try:
-            data = client_socket.recv(1024)
-            if data:
-                message = data.decode('utf-8').strip()
-                print(f"Received: {message}")
-                
-                # Echo response
-                response = f"Echo: {message}\n"
-                client_socket.send(response.encode('utf-8'))
-            else:
-                print("Client disconnected")
-        except Exception as e:
-            print(f"error receiving data {e}")
+# Handle data
+if client_socket in readable:
+    try:
+        data = client_socket.recv(1024)
+        if data:
+            message = data.decode('utf-8').strip()
+            print(f"Received: {message}")
+            
+            # Echo response
+            response = f"Echo: {message}\n"
+            client_socket.send(response.encode('utf-8'))
+        else:
+            print("Client disconnected")
+    except Exception as e:
+        print(f"error receiving data {e}")
 
+client_socket.close()
+server_socket.close()
 
 
 # async def handler(reader, writer):
