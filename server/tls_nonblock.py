@@ -34,7 +34,8 @@ while not client_socket:
         except socket.error as e:
             print(f"Error accepting connection: {e}")
 
-handshake_complete = False
+# handle_client
+handshake_complete = None
 while client_socket:
     read_ready = []
     write_ready = []
@@ -57,13 +58,15 @@ while client_socket:
         break
     
     # Handle SSL handshake
-    try:
-        client_socket.do_handshake()
-        handshake_complete = True
-        print("SSL handshake completed")
-    except Exception as e:
-        print(f"handshake fail {e}")
-        break
+    if not handshake_complete:
+        try:
+            client_socket.do_handshake()
+            handshake_complete = True
+            print("SSL handshake completed")
+            continue
+        except Exception as e:
+            print(f"handshake fail {e}")
+            break
     
     # Handle data
     if client_socket in readable:
