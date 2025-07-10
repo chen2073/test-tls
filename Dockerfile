@@ -40,3 +40,9 @@ FROM python AS receiver
 COPY ./receiver ./receiver
 
 CMD ["python", "-m", "receiver.tcp"]
+
+FROM go AS go_receiver
+
+WORKDIR /app
+
+COPY ./go_receiver ./go_receiver

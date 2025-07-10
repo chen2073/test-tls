@@ -37,6 +37,6 @@ services:
       target: receiver
     environment:
       - HOST=0.0.0.0
-      - PORT=9002
+      - PORT=9003
     ports:
-      - "9002:9002/tcp"
+      - "9003:9003/tcp"
