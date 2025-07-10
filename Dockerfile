@@ -41,8 +41,12 @@ COPY ./receiver ./receiver
 
 CMD ["python", "-m", "receiver.tcp"]
 
-FROM go AS go_receiver
+FROM golang:1.24 AS go_receiver
 
 WORKDIR /app
 
-COPY ./go_receiver ./go_receiver
+COPY ./go_receiver ./
+
+RUN go build -o receiver
+
+CMD ["/app/receiver"]
