@@ -31,16 +31,12 @@ services:
     environment:
       - HOST=server
       - PORT=8000
-  udp_server:
+  receiver:
     build: 
       context: .
-      target: python
-    working_dir: /app
-    command: python -m server.udp
-    volumes:
-      - ./server:/app/server
+      target: receiver
     environment:
       - HOST=0.0.0.0
-      - PORT=9001
+      - PORT=9002
     ports:
-      - "9001:9001/udp"
+      - "9002:9002/tcp"

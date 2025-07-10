@@ -34,3 +34,9 @@ COPY src ./src
 RUN cargo build --release
 
 CMD ["/app/target/release/rust_client"]
+
+FROM python AS receiver
+
+COPY ./receiver ./receiver
+
+CMD ["python", "-m", "receiver.tcp"]
