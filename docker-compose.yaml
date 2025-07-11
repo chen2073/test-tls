@@ -14,6 +14,8 @@ services:
     build:
       context: .
       target: python
+      args:
+        HOSTNAME: go_receiver
     working_dir: /app
     command: python client.py
     volumes:
@@ -28,9 +30,11 @@ services:
       context: ./rust_client
       dockerfile: ../Dockerfile
       target: rust
+      args:
+        HOSTNAME: go_receiver
     environment:
-      - HOST=server
-      - PORT=8000
+      - HOST=go_receiver
+      - PORT=9003
   receiver:
     build: 
       context: .
@@ -44,10 +48,12 @@ services:
     build:
       context: .
       target: go_receiver
+      args:
+        HOSTNAME: go_receiver
     environment:
       - HOST=0.0.0.0
       - PORT=9003
     ports:
       - "9003:9003/tcp"
-    volumes:
-      - ./certs:/certs
+    # volumes:
+    #   - ./certs:/certs

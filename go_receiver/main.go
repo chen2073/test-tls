@@ -4,11 +4,20 @@ import (
 	"bufio"
 	"crypto/tls"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"strings"
 )
+
+const (
+	certPath = "/certs/cert.pem"
+	keyPath  = "/certs/key.pem"
+)
+
+// const (
+// 	certPath = "/certs/server.crt"
+// 	keyPath  = "/certs/server.key"
+// )
 
 func main() {
 	// host := os.Getenv("HOST")
@@ -16,27 +25,13 @@ func main() {
 
 	address := fmt.Sprintf(":%s", port)
 
-	// listener, err := net.Listen("tcp", address)
-	// if err != nil {
-	// 	println("err starting tcp server")
-	// 	os.Exit(1)
-	// }
-
-	cert, err := tls.LoadX509KeyPair("/certs/server.crt", "/certs/server.key")
+	listener, err := tlsServer(address)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	config := &tls.Config{Certificates: []tls.Certificate{cert}}
-
-	listener, err := tls.Listen("tcp", address, config)
-	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("err starting server, %v\n", err)
+		os.Exit(1)
 	}
 
 	defer listener.Close()
-
-	fmt.Printf("tls Server listening on :%s\n", port)
 
 	for {
 		// Accept incoming connections
@@ -49,6 +44,36 @@ func main() {
 		// Handle each connection in a separate goroutine
 		go handleConnection(conn)
 	}
+}
+
+func tcpServer(address string) (net.Listener, error) {
+	listener, err := net.Listen("tcp", address)
+	if err != nil {
+		fmt.Printf("err starting tcp server %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("tcp Server listening on %s\n", address)
+
+	return listener, err
+}
+
+func tlsServer(address string) (net.Listener, error) {
+	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	config := &tls.Config{Certificates: []tls.Certificate{cert}}
+
+	listener, err := tls.Listen("tcp", address, config)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("tls Server listening on %s\n", address)
+
+	return listener, nil
 }
 
 func handleConnection(conn net.Conn) {

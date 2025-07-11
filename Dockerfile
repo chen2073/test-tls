@@ -1,5 +1,7 @@
 FROM python:3.12 AS python
 
+ARG HOSTNAME=server
+
 # Install required packages
 RUN apt-get update && apt-get install -y \
     openssl \
@@ -10,7 +12,7 @@ WORKDIR /certs
 
 # Generate private key and self-signed certificate
 RUN openssl req -x509 -newkey rsa:4096 -keyout /certs/key.pem -out /certs/cert.pem \
-    -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Organization/CN=server"
+    -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Organization/CN=$HOSTNAME"
 
 WORKDIR /app
 
@@ -42,6 +44,10 @@ COPY ./receiver ./receiver
 CMD ["python", "-m", "receiver.udp"]
 
 FROM golang:1.24 AS go_receiver
+
+WORKDIR /certs
+
+COPY --from=python /certs ./
 
 WORKDIR /app
 

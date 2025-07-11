@@ -68,8 +68,13 @@ fn main() {
     
     let connector = connector_builder.build();
 
+    let mut configurator = connector.configure().unwrap();
+
+    // disable hostname verify
+    configurator.set_verify_hostname(false);
+
     let raw_stream = TcpStream::connect(address).unwrap();
-    let mut stream = connector.connect(&host, raw_stream).unwrap();
+    let mut stream = configurator.connect(&host, raw_stream).unwrap();
 
     stream.write_all(b"hello world").unwrap();
     
