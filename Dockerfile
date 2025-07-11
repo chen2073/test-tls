@@ -39,7 +39,7 @@ FROM python AS receiver
 
 COPY ./receiver ./receiver
 
-CMD ["python", "-m", "receiver.tcp"]
+CMD ["python", "-m", "receiver.udp"]
 
 FROM golang:1.24 AS go_receiver
 

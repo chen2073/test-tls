@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"crypto/tls"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"strings"
@@ -14,15 +16,27 @@ func main() {
 
 	address := fmt.Sprintf(":%s", port)
 
-	listener, err := net.Listen("tcp", address)
+	// listener, err := net.Listen("tcp", address)
+	// if err != nil {
+	// 	println("err starting tcp server")
+	// 	os.Exit(1)
+	// }
+
+	cert, err := tls.LoadX509KeyPair("/certs/server.crt", "/certs/server.key")
 	if err != nil {
-		println("err starting tcp server")
-		os.Exit(1)
+		log.Fatal(err)
+	}
+
+	config := &tls.Config{Certificates: []tls.Certificate{cert}}
+
+	listener, err := tls.Listen("tcp", address, config)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	defer listener.Close()
 
-	fmt.Printf("TCP Server listening on :%s\n", port)
+	fmt.Printf("tls Server listening on :%s\n", port)
 
 	for {
 		// Accept incoming connections

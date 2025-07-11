@@ -49,3 +49,5 @@ services:
       - PORT=9003
     ports:
       - "9003:9003/tcp"
+    volumes:
+      - ./certs:/certs
