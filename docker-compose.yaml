@@ -33,17 +33,22 @@ services:
       args:
         HOSTNAME: go_receiver
     environment:
-      - HOST=go_receiver
+      - HOST=receiver
       - PORT=9003
+    volumes:
+      - ./certs/server.crt:/certs/cert.pem
   receiver:
     build: 
       context: .
       target: receiver
+    command: ["python", "-m", "receiver.tls"]
     environment:
       - HOST=0.0.0.0
       - PORT=9003
     ports:
       - "9003:9003/tcp"
+    volumes:
+      - ./certs:/certs
   go_receiver:
     build:
       context: .
