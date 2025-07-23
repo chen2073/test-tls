@@ -19,14 +19,14 @@ async def handle_client(
     while True:
         data = await reader.readline()
         if data == b"":
-            continue
+            break
         message = data.decode('utf8').rstrip()
         print(f"Read data: {message}")
             
-    # print("Closing client")
-    # writer.close()
-    # await writer.wait_closed()
-    # print("Client closed")
+    print("Closing client")
+    writer.close()
+    await writer.wait_closed()
+    print("Client closed")
 
 async def run_server():
     print("Starting server", flush=True)

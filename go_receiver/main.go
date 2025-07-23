@@ -9,23 +9,15 @@ import (
 	"strings"
 )
 
-const (
-	certPath = "/certs/cert.pem"
-	keyPath  = "/certs/key.pem"
-)
-
-// const (
-// 	certPath = "/certs/server.crt"
-// 	keyPath  = "/certs/server.key"
-// )
-
 func main() {
 	// host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
+	certPath := os.Getenv("CERTPATH")
+	keyPath := os.Getenv("KEYPATH")
 
 	address := fmt.Sprintf(":%s", port)
 
-	listener, err := tlsServer(address)
+	listener, err := tlsServer(address, certPath, keyPath)
 	if err != nil {
 		fmt.Printf("err starting server, %v\n", err)
 		os.Exit(1)
@@ -58,7 +50,7 @@ func tcpServer(address string) (net.Listener, error) {
 	return listener, err
 }
 
-func tlsServer(address string) (net.Listener, error) {
+func tlsServer(address string, certPath string, keyPath string) (net.Listener, error) {
 	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
 		return nil, err
@@ -89,6 +81,7 @@ func handleConnection(conn net.Conn) {
 		message := strings.TrimSpace(scanner.Text())
 
 		if message == "" {
+			fmt.Println("Received from nothing")
 			continue
 		}
 
