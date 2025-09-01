@@ -5,6 +5,8 @@ use std::env;
 use openssl::ssl::{SslConnector, SslMethod, SslStream};
 use std::io::{Read, Write};
 use std::net::TcpStream;
+use std::thread;
+use std::time::{Duration, Instant};
 
 // #[tokio::main]
 // async fn main() -> Result<(), Box<dyn Error>> {
@@ -63,19 +65,33 @@ fn main() {
     // connector_builder.set_verify(openssl::ssl::SslVerifyMode::NONE);
     
     // use local cert file
-    connector_builder.set_ca_file("/certs/cert.pem")
-        .unwrap_or_else(|_| panic!("unable to load cert"));
+    connector_builder.set_default_verify_paths();
     
     let connector = connector_builder.build();
 
-    let raw_stream = TcpStream::connect(address).unwrap();
-    let mut stream = connector.connect(&host, raw_stream).unwrap();
+    let mut configurator = connector.configure().unwrap();
 
-    stream.write_all(b"hello world").unwrap();
+    // disable hostname verify
+    configurator.set_verify_hostname(false);
+
+    let raw_stream = TcpStream::connect(address).unwrap();
+    let mut stream = configurator.connect(&host, raw_stream).unwrap();
+
+    let start = Instant::now();
+    let duration = Duration::from_secs(10);
     
-    // Read a fixed amount of data instead of reading until EOF
-    let mut buffer = [0; 1024];
-    let bytes_read = stream.read(&mut buffer).unwrap();
-    let response = String::from_utf8_lossy(&buffer[..bytes_read]);
-    println!("received: {}", response);
+    // while start.elapsed() < duration {
+    //     stream.write_all(b"hello world\n").unwrap();
+    //     thread::sleep(Duration::from_secs(3));
+    // }
+
+    stream.write_all(b"hello world\n").unwrap();
+    stream.write_all(b"hello world\n").unwrap();
+    stream.shutdown();
+    
+    // // Read a fixed amount of data instead of reading until EOF
+    // let mut buffer = [0; 1024];
+    // let bytes_read = stream.read(&mut buffer).unwrap();
+    // let response = String::from_utf8_lossy(&buffer[..bytes_read]);
+    // println!("received: {}", response);
 }

@@ -14,6 +14,8 @@ services:
     build:
       context: .
       target: python
+      args:
+        HOSTNAME: go_receiver
     working_dir: /app
     command: python client.py
     volumes:
@@ -28,6 +30,41 @@ services:
       context: ./rust_client
       dockerfile: ../Dockerfile
       target: rust
+      args:
+        HOSTNAME: go_receiver
     environment:
-      - HOST=server
-      - PORT=8000
+      - HOST=go_receiver
+      - PORT=9003
+      - SSL_CERT_FILE=/certs/certchain.cer
+      - SSL_CERT_DIR=/certs
+    volumes:
+      # - ./certs/server.crt:/certs/cert.pem
+      - ./lin-jchen-01.int.cpacket.com/certchain.cer:/certs/certchain.cer
+  receiver:
+    build: 
+      context: .
+      target: receiver
+    command: ["python", "-m", "receiver.tls"]
+    environment:
+      - HOST=0.0.0.0
+      - PORT=9003
+    ports:
+      - "9003:9003/tcp"
+    volumes:
+      - ./certs:/certs
+  go_receiver:
+    build:
+      context: .
+      target: go_receiver
+      args:
+        HOSTNAME: go_receiver
+    environment:
+      - HOST=0.0.0.0
+      - PORT=9003
+      - CERTPATH=/certs/lin-jchen-01.int.cpacket.com.cer
+      - KEYPATH=/certs/lin-jchen-01.int.cpacket.com.key
+    ports:
+      - "9003:9003/tcp"
+    volumes:
+      - ./lin-jchen-01.int.cpacket.com/lin-jchen-01.int.cpacket.com.cer:/certs/lin-jchen-01.int.cpacket.com.cer
+      - ./lin-jchen-01.int.cpacket.com/lin-jchen-01.int.cpacket.com.key:/certs/lin-jchen-01.int.cpacket.com.key
